@@ -4,6 +4,7 @@ import com.example.library.model.Member;
 import com.example.library.util.DbConnection;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MemberDAOImpl implements MemberDAO{
@@ -44,13 +45,41 @@ public class MemberDAOImpl implements MemberDAO{
     }
 
     @Override
-    public List<Member> findAll() {
-        return List.of();
+    public List<Member> findAll() throws SQLException {
+        List<Member> memberList = new ArrayList<>();
+        Connection connection = DbConnection.getConnection();
+        String selectSql = "SELECT * FROM members";
+        PreparedStatement preparedStatement = connection.prepareStatement(selectSql);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()){
+            int memberId = resultSet.getInt("member_id");
+            String fullName = resultSet.getString("full_name");
+            String email = resultSet.getString("email");
+            String phoneNo = resultSet.getString("phone");
+            Date joined_date = resultSet.getDate("joined_date");
+            Member member = new Member(memberId, fullName, email, phoneNo, joined_date);
+            memberList.add(member);
+        }
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
+        return memberList;
     }
 
     @Override
-    public void update(Member member) {
+    public int update(Member member) throws SQLException {
+        Connection connection = DbConnection.getConnection();
+        String sql = "UPDATE members SET email= ?, phone = ? WHERE memner_id =?";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, member.getEmail());
+        preparedStatement.setString(2, member.getPhone());
+        preparedStatement.setInt(3, member.getMemberId());
 
+        int rows = preparedStatement.executeUpdate();
+        preparedStatement.close();
+        connection.close();;
+        return rows;
     }
 
     @Override

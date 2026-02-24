@@ -8,7 +8,8 @@ import java.util.List;
 public interface MemberDAO {
     int save(Member member) throws SQLException;
     Member findById(int id) throws SQLException;
-    List<Member> findAll();
-    void update(Member member);
+    List<Member> findAll() throws SQLException;
+
+    int update(Member member) throws SQLException;
     int delete(int id) throws SQLException;
 }
